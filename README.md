@@ -67,7 +67,8 @@ Execution
 
 Docker
 Nginx
-🚀 Key Features
+
+ Key Features
 Private Credit Validation (ZK-based)
 Real-Time Negotiation Engine
 Zero-Fee Execution via Hydra
