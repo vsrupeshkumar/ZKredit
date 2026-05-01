@@ -1,0 +1,70 @@
+# Zkredit - Production Docker Compose
+# Optimized for production deployment
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: zkredit-backend:latest
+    container_name: zkredit-backend-prod
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
+      - HYDRA_NODE_URL=${HYDRA_NODE_URL:-ws://127.0.0.1:4001}
+      - HYDRA_MODE=${HYDRA_MODE:-auto}
+      - MIDNIGHT_API_URL=${MIDNIGHT_API_URL:-}
+      - MIDNIGHT_API_KEY=${MIDNIGHT_API_KEY:-}
+      - BLOCKFROST_PROJECT_ID=${BLOCKFROST_PROJECT_ID:-}
+      - CARDANO_NETWORK=${CARDANO_NETWORK:-testnet}
+      - CREDIT_ORACLE_URL=${CREDIT_ORACLE_URL:-}
+      - CREDIT_ORACLE_API_KEY=${CREDIT_ORACLE_API_KEY:-}
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - zkredit-network
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: zkredit-frontend:latest
+    container_name: zkredit-frontend-prod
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - zkredit-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+networks:
+  zkredit-network:
+    driver: bridge
+

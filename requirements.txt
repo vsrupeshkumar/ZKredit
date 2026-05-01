@@ -1,0 +1,29 @@
+# ============================================================================
+# Zkredit - Python Dependencies
+# ============================================================================
+
+# AI Agent Framework
+crewai[tools]>=0.108.0
+
+# LLM Integration (configured for local Ollama/Llama 3)
+langchain>=0.1.0
+langchain-openai>=0.0.5
+litellm>=1.0.0
+
+# WebSocket client for Hydra Node
+websockets>=12.0
+
+# Utilities
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+
+# PyCardano for real Cardano transaction building (optional)
+# pip install pycardano>=0.9.0  # Uncomment if you want real Cardano transactions
+
+# Requests for API calls (Midnight, Oracle)
+requests>=2.31.0
+
+# Masumi Cardano Agent (Cardano blockchain integration)
+# Note: Masumi is installed as a local package, dependencies included below
+crewai[tools]>=0.108.0
+langtrace-python-sdk==3.8.9

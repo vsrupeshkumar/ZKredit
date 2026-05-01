@@ -1,0 +1,100 @@
+services:
+  # ============================================================================
+  # Backend API Server
+  # ============================================================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: zkredit-backend
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
+      - HYDRA_NODE_URL=${HYDRA_NODE_URL:-ws://127.0.0.1:4001}
+      - HYDRA_MODE=${HYDRA_MODE:-auto}
+      - KUPO_BASE_URL=${KUPO_BASE_URL:-https://kupo-preprod.kupo.network}
+      - MIDNIGHT_API_URL=${MIDNIGHT_API_URL:-}
+      - MIDNIGHT_API_KEY=${MIDNIGHT_API_KEY:-}
+      - BLOCKFROST_PROJECT_ID=${BLOCKFROST_PROJECT_ID:-}
+      - CARDANO_NETWORK=${CARDANO_NETWORK:-testnet}
+      - CREDIT_ORACLE_URL=${CREDIT_ORACLE_URL:-}
+      - CREDIT_ORACLE_API_KEY=${CREDIT_ORACLE_API_KEY:-}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - zkredit-network
+
+  # ============================================================================
+  # Frontend (Production Build)
+  # ============================================================================
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: zkredit-frontend
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - zkredit-network
+
+  # ============================================================================
+  # Ollama (Optional - for AI agents)
+  # ============================================================================
+  ollama:
+    image: ollama/ollama:latest
+    container_name: zkredit-ollama
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - zkredit-network
+    profiles:
+      - with-ollama
+
+  # ============================================================================
+  # Cardano Node (Optional - for testing)
+  # ============================================================================
+  cardano-node:
+    image: ghcr.io/intersectmbo/cardano-node:8.9.2
+    container_name: zkredit-cardano-node
+    environment:
+      - NETWORK=devnet
+    ports:
+      - "3001:3001"
+    volumes:
+      - node-data:/data
+      - node-ipc:/ipc
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f 127.0.0.1:12798/metrics | grep cardano_node_metrics_blockNum_int || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zkredit-network
+    profiles:
+      - with-cardano
+
+volumes:
+  node-data:
+  node-ipc:
+  ollama-data:
+
+networks:
+  zkredit-network:
+    driver: bridge

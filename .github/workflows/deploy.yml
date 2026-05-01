@@ -1,0 +1,138 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    # Only run if Vercel secrets are configured
+    if: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: frontend/Dashboard/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd frontend/Dashboard
+        npm ci
+    
+    - name: Build frontend
+      run: |
+        cd frontend/Dashboard
+        npm run build
+    
+    - name: Deploy to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-args: '--prod'
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        working-directory: frontend/Dashboard
+
+  deploy-backend:
+    runs-on: ubuntu-latest
+    # Only run if Vercel backend secrets are configured  
+    if: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_BACKEND_PROJECT_ID != '' }}
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r backend/api/requirements.txt
+    
+    - name: Deploy backend to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-args: '--prod'
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_BACKEND_PROJECT_ID }}
+        working-directory: .
+
+  docker-deploy:
+    runs-on: ubuntu-latest
+    # Only run on manual trigger and if Docker Hub secrets are configured
+    if: ${{ github.event_name == 'workflow_dispatch' && secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+    - name: Build and push backend
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile.backend
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/zkredit-backend:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Build and push frontend
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile.frontend
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/zkredit-frontend:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  deployment-status:
+    runs-on: ubuntu-latest
+    needs: [deploy-frontend, deploy-backend, docker-deploy]
+    if: always()
+    steps:
+    - name: Check deployment status
+      run: |
+        echo "# Deployment Status" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ needs.deploy-frontend.result }}" == "success" ]; then
+          echo "✅ Frontend deployed to Vercel" >> $GITHUB_STEP_SUMMARY
+        elif [ "${{ needs.deploy-frontend.result }}" == "skipped" ]; then
+          echo "⏭️  Frontend deployment skipped (Vercel secrets not configured)" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Frontend deployment failed" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        if [ "${{ needs.deploy-backend.result }}" == "success" ]; then
+          echo "✅ Backend deployed to Vercel" >> $GITHUB_STEP_SUMMARY
+        elif [ "${{ needs.deploy-backend.result }}" == "skipped" ]; then
+          echo "⏭️  Backend deployment skipped (Vercel secrets not configured)" >> $GITHUB_STEP_SUMMARY  
+        else
+          echo "❌ Backend deployment failed" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        if [ "${{ needs.docker-deploy.result }}" == "success" ]; then
+          echo "✅ Docker images pushed to Docker Hub" >> $GITHUB_STEP_SUMMARY
+        elif [ "${{ needs.docker-deploy.result }}" == "skipped" ]; then
+          echo "⏭️  Docker deployment skipped (manual dispatch required or secrets missing)" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Docker deployment failed" >> $GITHUB_STEP_SUMMARY
+        fi

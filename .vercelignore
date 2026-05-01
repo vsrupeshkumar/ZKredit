@@ -1,0 +1,58 @@
+# Zkredit unified Vercel deployment ignore rules.
+# Keep only what is required to build frontend/Dashboard and run api/index.py.
+
+# VCS and editor files
+.git/
+.github/
+.agent/
+.cursor/
+.vscode/
+.idea/
+
+# Python cache and environments
+__pycache__/
+*.py[cod]
+venv/
+env/
+ENV/
+.Python
+
+# Local env files
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+node_modules/
+frontend/Dashboard/node_modules/
+frontend/Dashboard/dist/
+dist/
+build/
+
+# Dependency files
+# Keep root requirements out of Vercel bundle so Python function
+# uses api/requirements.txt (minimal deployable dependency set).
+requirements.txt
+
+# Large or local-only project areas not needed in Vercel runtime
+backend/
+agents/
+hydra/
+midnight/
+contracts/
+docs/
+
+# Docker and local deployment files
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+nginx.conf
+deploy.sh
+install_aiken.sh
+check-health.sh
+
+# Tests and logs
+test_integration.py
+logs/
+*.log
+

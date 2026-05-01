@@ -1,0 +1,149 @@
+# Hydra Node Configuration
+# This file contains manual configuration for Hydra nodes used in off-chain negotiations
+# Each node can be configured with custom settings for different environments
+
+# Default environment to use when none is specified
+default_environment: development
+
+# Node configurations by environment
+environments:
+  development:
+    nodes:
+      - name: "Local Hydra Node"
+        url: "ws://localhost:4001"
+        description: "Development node running locally"
+        timeout: 30
+        retry_count: 3
+        enabled: true
+
+      - name: "TestNet Node 1"
+        url: "wss://hydra-testnet-1.iohk.io:4001"
+        description: "IOHK TestNet Hydra node"
+        timeout: 60
+        retry_count: 5
+        enabled: true
+
+      - name: "TestNet Node 2"
+        url: "wss://hydra-testnet-2.iohk.io:4001"
+        description: "Backup IOHK TestNet Hydra node"
+        timeout: 60
+        retry_count: 5
+        enabled: false  # Disabled by default, enable if needed
+
+  staging:
+    nodes:
+      - name: "Staging Node 1"
+        url: "wss://hydra-staging-1.iohk.io:4001"
+        description: "Staging environment primary node"
+        timeout: 45
+        retry_count: 4
+        enabled: true
+
+      - name: "Staging Node 2"
+        url: "wss://hydra-staging-2.iohk.io:4001"
+        description: "Staging environment backup node"
+        timeout: 45
+        retry_count: 4
+        enabled: true
+
+  production:
+    nodes:
+      - name: "Production Node 1"
+        url: "wss://hydra-mainnet-1.iohk.io:4001"
+        description: "Production mainnet node"
+        timeout: 120
+        retry_count: 10
+        enabled: true
+
+      - name: "Production Node 2"
+        url: "wss://hydra-mainnet-2.iohk.io:4001"
+        description: "Production mainnet backup node"
+        timeout: 120
+        retry_count: 10
+        enabled: true
+
+      - name: "Production Node 3"
+        url: "wss://hydra-mainnet-3.iohk.io:4001"
+        description: "Production mainnet tertiary node"
+        timeout: 120
+        retry_count: 10
+        enabled: false  # Spare node for high availability
+
+# Custom node configurations (add your own nodes here)
+custom_nodes:
+  # Hexcore.io.vn Hydra Nodes (Active - Status: checked)
+  # Group 1
+  - name: "Hexcore Node 1-1"
+    url: "wss://e3fa6041998381f5.hexcore.io.vn"
+    description: "Hexcore.io.vn Hydra node (Group 1, API: e3fa6041998381f5)"
+    timeout: 45
+    retry_count: 5
+    enabled: true
+
+  - name: "Hexcore Node 1-2"
+    url: "wss://8f7b2a9b8bf31747.hexcore.io.vn"
+    description: "Hexcore.io.vn Hydra node (Group 1, API: 8f7b2a9b8bf31747)"
+    timeout: 45
+    retry_count: 5
+    enabled: true
+
+  # Group 2
+  - name: "Hexcore Node 2-1"
+    url: "wss://45f3987db6d8046c.hexcore.io.vn"
+    description: "Hexcore.io.vn Hydra node (Group 2, API: 45f3987db6d8046c)"
+    timeout: 45
+    retry_count: 5
+    enabled: true
+
+  # Add remaining Hexcore nodes here (Groups 2-5, 7 more nodes)
+  # Use the pattern: wss://<API_KEY>.hexcore.io.vn
+
+  - name: "My Custom Node"
+    url: "ws://my-hydra-node.example.com:4001"
+    description: "Custom Hydra node for testing"
+    timeout: 30
+    retry_count: 3
+    enabled: false  # Set to true to enable
+
+# Global settings
+global_settings:
+  connection_timeout: 10  # Initial connection timeout in seconds
+  heartbeat_interval: 30  # Send heartbeat every 30 seconds
+  max_reconnect_attempts: 5  # Maximum reconnection attempts
+  reconnect_delay: 5  # Delay between reconnection attempts in seconds
+
+# Node selection strategy
+selection_strategy: "round_robin"  # Options: round_robin, random, priority
+# - round_robin: Cycle through enabled nodes in order
+# - random: Randomly select from enabled nodes
+# - priority: Use nodes in the order they appear (first enabled node gets priority)
+
+# Health check settings
+health_check:
+  enabled: true
+  interval: 60  # Check node health every 60 seconds
+  timeout: 10  # Health check timeout in seconds
+  unhealthy_threshold: 3  # Mark node unhealthy after 3 failed checks
+  recovery_threshold: 2  # Mark node healthy after 2 successful checks
+
+# Example of how to add a new node:
+#
+# environments:
+#   development:
+#     nodes:
+#       - name: "My New Node"
+#         url: "ws://new-hydra-node.example.com:4001"
+#         description: "Description of the new node"
+#         timeout: 30
+#         retry_count: 3
+#         enabled: true
+#
+# Or add to custom_nodes section:
+#
+# custom_nodes:
+#   - name: "Another Custom Node"
+#     url: "wss://another-node.io:4001"
+#     description: "Another custom Hydra node"
+#     timeout: 45
+#     retry_count: 5
+#     enabled: true

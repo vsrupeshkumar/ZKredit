@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+# Python lib (not frontend src/lib)
+/lib/
+/lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+env/
+ENV/
+
+# Aiken
+artifacts/
+plutus.json
+*.uplc
+
+# Logs
+logs/
+*.log
+xai_decisions.jsonl
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Midnight
+*.midnight-build/
+*.zk-artifact
+
+# Node.js / Frontend
+node_modules/
+frontend/Dashboard/node_modules/
+frontend/Dashboard/dist/
+*.lock
+bun.lockb
+package-lock.json

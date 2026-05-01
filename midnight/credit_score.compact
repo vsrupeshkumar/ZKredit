@@ -1,0 +1,114 @@
+// ============================================================================
+// Zkredit - Credit Score Validator (Midnight Compact)
+// ============================================================================
+// This is a privacy-preserving smart contract written in Midnight's Compact
+// language. It allows a borrower to prove their creditworthiness without
+// revealing their actual credit score using Zero-Knowledge Proofs.
+//
+// The borrower provides their credit score as a PRIVATE input.
+// The contract outputs a PUBLIC boolean indicating eligibility.
+// The lender learns ONLY whether the borrower is eligible, not the score.
+// ============================================================================
+
+export contract CreditScoreValidator;
+
+// ============================================================================
+// Circuit Definition
+// ============================================================================
+
+/// Determines if a borrower is eligible for a loan based on credit score
+/// without revealing the actual score to the lender.
+///
+/// @param credit_score - Private input: The borrower's credit score (0-850)
+/// @returns is_eligible - Public output: Whether the borrower qualifies
+circuit check_eligibility(
+    private credit_score: Uint
+) -> (public is_eligible: Boolean) {
+    
+    // Privacy-preserving credit check threshold
+    const MIN_CREDIT_SCORE: Uint = 700;
+    
+    // Zero-knowledge proof: Prove credit_score > 700 without revealing score
+    is_eligible = credit_score > MIN_CREDIT_SCORE;
+    
+    return (is_eligible);
+}
+
+// ============================================================================
+// Contract State
+// ============================================================================
+
+/// The contract state stores eligibility records
+struct State {
+    /// Mapping from borrower public key to eligibility status
+    /// Note: In production, you might want to include expiry timestamps
+    eligibilities: Map<PublicKey, Boolean>
+}
+
+// ============================================================================
+// Contract Transitions
+// ============================================================================
+
+/// Transition to check and record a borrower's eligibility
+@transition
+fn check_and_record(
+    state: State,
+    borrower_key: PublicKey,
+    private credit_score: Uint
+) -> State {
+    
+    // Execute the ZK circuit
+    let (is_eligible) = check_eligibility(credit_score);
+    
+    // Update state with the result
+    let new_eligibilities = state.eligibilities.insert(borrower_key, is_eligible);
+    
+    return State {
+        eligibilities: new_eligibilities
+    };
+}
+
+/// Query a borrower's eligibility status
+@readonly
+fn get_eligibility(
+    state: State,
+    borrower_key: PublicKey
+) -> Option<Boolean> {
+    return state.eligibilities.get(borrower_key);
+}
+
+// ============================================================================
+// Ledger Initial State
+// ============================================================================
+
+/// Initialize the contract with an empty eligibility map
+@initializer
+fn initialize() -> State {
+    return State {
+        eligibilities: Map::new()
+    };
+}
+
+// ============================================================================
+// Usage Example (in comments)
+// ============================================================================
+
+// BORROWER SIDE (Private):
+// -----------------------
+// let my_credit_score: Uint = 750;  // This stays private!
+// let proof = check_eligibility(my_credit_score);
+// submit_to_midnight(proof);
+//
+// LENDER SIDE (Public):
+// --------------------
+// let eligibility = get_eligibility(borrower_public_key);
+// if eligibility == Some(true) {
+//     // Borrower is eligible, proceed with loan offer
+// } else {
+//     // Borrower is not eligible or hasn't submitted proof
+// }
+//
+// WHAT THE LENDER SEES:
+// --------------------
+// is_eligible: true
+// credit_score: <HIDDEN>  // Zero-knowledge magic!

@@ -1,0 +1,13 @@
+# Zkredit - Backend API Requirements
+
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+websockets>=12.0
+pydantic>=2.5.0
+python-dotenv>=1.0.0
+
+# PyCardano for real Cardano transaction building
+pycardano>=0.9.0
+
+# Requests for API calls (Midnight, Oracle)
+requests>=2.31.0

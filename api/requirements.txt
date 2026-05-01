@@ -1,0 +1,24 @@
+# Vercel-specific requirements for backend deployment
+# MINIMAL dependencies only - heavy AI/ML packages excluded due to size limits
+# Pinned versions to minimize size and avoid pulling in unnecessary dependencies
+
+# Core API dependencies (minimal set)
+fastapi==0.109.0
+pydantic==2.11.10
+python-dotenv==1.0.0
+requests==2.31.0
+
+# Note: uvicorn is included by FastAPI but Vercel uses its own server
+# No need to explicitly include it
+
+# NOTE: Full backend with AI features (CrewAI, LangChain, etc.) exceeds Vercel's
+# 250MB serverless function limit. For full functionality, deploy backend to:
+# - Railway (recommended): https://railway.app
+# - Render: https://render.com
+# - Fly.io: https://fly.io
+# - Or use Docker deployment locally
+
+# If you need full AI features on Vercel, consider:
+# 1. Deploy frontend to Vercel
+# 2. Deploy backend to Railway/Render with full dependencies
+# 3. Connect frontend to backend via environment variables
