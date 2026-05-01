@@ -1,4 +1,4 @@
-# Zkredit
+# ZKredit
 
 **Privacy-First DeFi Lending**
 
