@@ -1,332 +1,139 @@
-# Zkredit
+Autonomous Negotiation for Private, Zero-Fee Lending on Cardano
+🧠 Overview
 
-**Privacy-First DeFi Lending**
+Zkredit is a decentralized credit protocol where lending agreements are negotiated, optimized, and executed in real time—without intermediaries, without fees, and without exposing user data.
 
-Zkredit is a decentralized lending protocol that uses AI agents to negotiate loans in private Hydra Heads with zero gas fees, employing Midnight zero-knowledge proofs for credit scoring, and featuring an immersive dashboard interface.
+By combining zero-knowledge credit validation, off-chain execution via Hydra, and autonomous negotiation systems, Zkredit transforms lending into a self-operating financial layer.
 
-## Quick Start
+⚡ The Problem
 
-### Docker Deployment (Recommended)
+Traditional DeFi lending is fundamentally broken:
 
-```bash
-# Full stack deployment
-./deploy.sh
+Static terms → no real negotiation
+Public financial data → zero privacy
+High gas fees → inefficient execution
+Manual decision-making → slow and suboptimal
 
-# Or manually
-docker-compose up -d
+Users are forced into rigid, transparent, and costly systems.
 
-# Production deployment
-docker-compose -f docker-compose.prod.yml up -d
-```
+💡 The Solution
 
-### Vercel Deployment (Cloud)
+Zkredit introduces a new primitive for lending:
 
-**IMPORTANT:** Vercel has a 250MB limit for serverless functions. The full backend with AI dependencies exceeds this limit.
+Agreements that negotiate themselves, privately and instantly.
 
-**Deploy-Ready Strategy (single Vercel project):**
+Dynamic negotiation → credit terms adapt in real time
+Zero-knowledge validation → no exposure of sensitive data
+Hydra execution → instant, zero-fee settlement
+Autonomous flow → no manual intervention required
+🏗️ Architecture
+🔐 Core Components
+1. Zero-Knowledge Credit Layer
+Validates borrower credibility without revealing raw financial data
+Ensures privacy-first risk assessment
+2. Negotiation Engine
+Continuously optimizes:
+Interest rates
+Loan duration
+Collateral requirements
+Produces market-efficient outcomes in real time
+3. Hydra Execution Layer
+Off-chain negotiation and agreement finalization
+Zero gas fees + instant settlement
+4. Smart Contract Settlement
+Final agreements are enforced on-chain
+Trustless and verifiable execution
+⚙️ Tech Stack
 
-1. **Deploy from repository root:**
-   ```bash
-   vercel --prod
-   ```
-   - Builds `frontend/Dashboard` as a static SPA
-   - Serves API from `api/index.py`
-   - Routes `/api/*` and `/health` to the serverless API function
+Protocol Layer
 
-2. **Frontend environment variables (optional):**
-   - `VITE_API_URL`
-   - `VITE_WS_URL`
-   
-   If not set, frontend defaults to same-origin (recommended for this unified deployment).
+Cardano
+Hydra Heads
+Aiken Smart Contracts
+Midnight (ZK Layer)
 
-3. **Full AI backend (optional external):**
-   - Deploy full backend (`backend/api/server.py` + agents) to Railway/Render/Fly.io
-   - Point `VITE_API_URL` and `VITE_WS_URL` to that external backend URL
+Backend
 
-**Access Points (unified Vercel mode):**
-- Frontend: https://your-project.vercel.app
-- API: https://your-project.vercel.app/api/dashboard/stats
-- API Documentation: https://your-project.vercel.app/docs
+FastAPI
+WebSockets
 
-**Docker Access Points:**
-- Frontend: http://localhost:80
-- Backend API: http://localhost:8000
-- API Documentation: http://localhost:8000/docs
+Frontend
 
-### Manual Setup
+React + TypeScript
+Vite
+Tailwind CSS
 
-```bash
-# Start Backend
-cd backend/api
-uvicorn server:app --host 0.0.0.0 --port 8000
+Execution
 
-# Start Frontend (separate terminal)
-cd frontend/Dashboard
-npm run dev
+Docker
+Nginx
+🚀 Key Features
+Private Credit Validation (ZK-based)
+Real-Time Negotiation Engine
+Zero-Fee Execution via Hydra
+Trustless Smart Contract Settlement
+Live Workflow Visualization
+Autonomous Lending Flow
+📊 Why This Matters
 
-# Access:
-# Frontend: http://localhost:8080
-# API Docs: http://localhost:8000/docs
-```
+Zkredit shifts DeFi from:
 
-## Architecture
+Manual, static, transparent systems
 
-```mermaid
-sequenceDiagram
-    participant B as Borrower
-    participant M as Midnight Network
-    participant L as Lender
-    participant AI as AI Agent (Lenny)
-    participant H as Hydra Head
-    participant A as Aiken Validator
+to:
 
-    B->>M: Submit Credit Score (private)
-    M->>L: is_eligible: true (ZK proof)
-    Note over M,L: Score remains HIDDEN!
-    L->>AI: Loan Offer (8.5%)
-    AI->>AI: Analyze with Llama 3
-    AI->>H: Open Hydra Head
-    loop Off-chain Negotiation
-        AI->>H: Counter-offer (zero gas)
-        H->>H: Real-time negotiation
-    end
-    AI->>H: Accept Final Terms (7.0%)
-    H->>A: Close Head + Settlement Tx
-    A->>A: Verify Dual Signatures
-    A->>B: Loan Disbursed!
-    Note over B,A: Saved 1.5% through AI negotiation!
-```
+Autonomous, adaptive, and private financial infrastructure
 
-### Core Components
+This is not an improvement—
+it’s a paradigm shift in how credit markets operate.
 
-- **Midnight Network**: Zero-knowledge credit verification ([docs/midnight.md](docs/midnight.md))
-- **Hydra Heads**: Layer 2 scaling for off-chain negotiations ([docs/hydra.md](docs/hydra.md))
-- **AI Agents**: Automated loan analysis and negotiation ([docs/masumi.md](docs/masumi.md))
-- **Aiken Validators**: On-chain settlement verification
+🧪 Local Development
+# Clone repo
+git clone <your-repo-url>
+cd zkredit
 
-### Data Flow
-
-Borrower → Midnight ZK Check → Lender Offer → AI Analysis → Hydra Negotiation → Aiken Settlement
-
-## Technology Stack
-
-### Backend Components
-
-| Component | Technology | Description |
-|-----------|------------|-------------|
-| AI Agents | CrewAI + Llama 3 | Loan negotiation automation |
-| Layer 2 Scaling | Hydra Head Protocol | Zero-gas off-chain negotiations |
-| Smart Contracts | Aiken Language | Settlement validation |
-| Privacy Layer | Midnight Network | Zero-knowledge proofs |
-| API Layer | FastAPI + WebSockets | Real-time communication |
-
-### Frontend Components
-
-| Component | Technology | Description |
-|-----------|------------|-------------|
-| UI Framework | React + TypeScript | Type-safe user interface |
-| Build System | Vite | Fast development and bundling |
-| Styling | Tailwind CSS | Utility-first CSS framework |
-| State Management | React Query | Server state synchronization |
-
-## Key Features
-
-### Complete Lending Workflow
-
-1. Privacy-Preserving Credit Checks - Zero-knowledge proofs via Midnight Network
-2. AI-Powered Analysis - Local Llama 3 model analyzes loan terms
-3. Layer 2 Negotiation - Zero-gas Hydra Head protocol for off-chain negotiation
-4. Automated Settlement - Smart contract verification with dual signatures
-5. Real-time Monitoring - WebSocket-based live updates
-
-### AI Agent System
-
-- Borrower Agent (Lenny) - Optimizes loan terms through negotiation
-- Lender Agent (Luna) - Risk assessment and counter-offer evaluation
-- Explainable AI - Decision logging with reasoning and confidence scores
-
-### Frontend Dashboard
-
-- Wallet Connection - Eternl, Nami, and other CIP-30 wallets
-- Role Selection - Choose to be Borrower or Lender
-- Stablecoin Selection - USDT, USDC, DAI with liquidity suggestions
-- Auto-Confirm Toggle - Let AI auto-accept good deals
-- Agent Conversations - Real-time negotiation chat between agents
-- Workflow Visualizer - Live step-by-step progress
-- Trade History - Completed loans with savings shown
-
-## Installation
-
-### Prerequisites
-
-- Node.js 18+
-- Python 3.10+
-- Ollama (for local AI models)
-
-### Setup
-
-```bash
-# Clone repository
-git clone <repository-url>
-cd Zkredit-AI
-
-# Install dependencies
+# Install backend deps
 pip install -r requirements.txt
-pip install -r backend/api/requirements.txt
 
+# Start backend
+cd backend/api
+uvicorn server:app --reload
+
+# Start frontend
 cd frontend/Dashboard
 npm install
-cd ../..
-
-# Install Ollama and models
-curl -fsSL https://ollama.com/install.sh | sh
-ollama pull llama3
-```
-
-### Running
-
-```bash
-# Terminal 1 - Backend
-cd backend/api
-uvicorn server:app --host 0.0.0.0 --port 8000
-
-# Terminal 2 - Frontend
-cd frontend/Dashboard
 npm run dev
 
-# Terminal 3 - Ollama
-ollama serve
-```
+# Run Docker (optional)
+docker-compose up --build
+🌐 Deployment
+Frontend: Vercel (SPA)
+Backend: Docker / Railway / Render
+Execution Layer: Hydra Node
+Optional: External compute for negotiation engine
+🎯 Vision
 
-### Access Points
+Zkredit is building the autonomous credit layer for decentralized finance—
+where capital flows are:
 
-| Service | URL |
-|---------|-----|
-| Frontend | http://localhost:8080 |
-| Backend API | http://localhost:8000 |
-| API Documentation | http://localhost:8000/docs |
+Self-optimizing
+Privacy-preserving
+Instantly executed
+📌 Roadmap
+ Advanced credit scoring models
+ Multi-asset lending pools
+ Cross-chain interoperability
+ Institutional-grade risk modules
+ On-chain governance
+🤝 Contributing
 
-## API Reference
+We welcome contributors building the future of decentralized finance.
 
-### Core Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/workflow/start` | POST | Initiate lending workflow |
-| `/api/dashboard/stats` | GET | Get dashboard statistics |
-| `/api/trades/history` | GET | Retrieve trade history |
-| `/api/agent/status` | GET | Check AI agent status |
-| `/ws` | WebSocket | Real-time updates |
-
-## Project Structure
-
-```
-Zkredit-AI/
-├── agents/                      # AI agent implementations
-│   ├── borrower_agent.py       # Borrower negotiation agent
-│   ├── lender_agent.py         # Lender evaluation agent
-│   └── masumi/                 # Masumi Cardano analysis tools
-├── backend/                    # Backend services
-│   ├── api/server.py          # FastAPI backend server
-│   ├── cardano/               # Cardano transaction builders
-│   └── midnight/              # Midnight ZK client
-├── contracts/                  # Aiken smart contracts
-├── frontend/Dashboard/         # React frontend application
-├── hydra/                     # Hydra Head protocol client
-├── midnight/                  # Midnight compiled contracts
-└── docs/                      # Documentation and guides
-    ├── hydra.md               # Hydra Head protocol integration
-    ├── midnight.md            # Midnight ZK proofs
-    └── masumi.md              # Masumi AI agent system
-```
-
-## Configuration
-
-### Environment Variables
-
-Environment variables can be set in a `.env` file:
-
-```env
-# Backend Configuration
-OLLAMA_BASE_URL=http://localhost:11434
-HYDRA_NODE_URL=ws://127.0.0.1:4001
-HYDRA_MODE=auto
-PORT=8000
-
-# Midnight Network (optional)
-MIDNIGHT_API_URL=https://api.midnight.network
-KUPO_BASE_URL=https://kupo-preprod.kupo.network
-
-# Frontend Configuration
-# Optional. If omitted, frontend uses same-origin URLs.
-VITE_API_URL=http://localhost:8000
-VITE_WS_URL=ws://localhost:8000/ws
-```
-
-## Development
-
-### Testing
-
-```bash
-# Test Python syntax
-python -m py_compile agents/*.py backend/api/server.py
-
-# Build frontend
-cd frontend/Dashboard
-npm run build
-```
-
-### Vercel Deployment Notes
-
-**CRITICAL:** Vercel has a **250MB unzipped size limit** for serverless functions. The full backend with AI dependencies exceeds this limit.
-
-**Current Vercel mode in this repo:**
-
-1. `vercel --prod` deploys both frontend and lightweight API from the same project.
-2. Lightweight API supports dashboard endpoints used by the UI and mock workflow simulation.
-3. For full AI negotiations with CrewAI/Ollama/Hydra websocket flows, use an external backend and set:
-   - `VITE_API_URL`
-   - `VITE_WS_URL`
-
-**Other Vercel Limitations:**
-- Ollama not available - Use external Ollama instance
-- Function timeout - 10s limit (too short for AI negotiations)
-- Storage limits - No persistent storage
-
-**For Local Development:**
-- Use Docker deployment (`./deploy.sh`)
-- Ollama runs locally with full AI capabilities
-
-### Post-Deploy Verification
-
-Run the release health checklist script after each deployment:
-
-```bash
-scripts/post-deploy-check.sh https://your-project.vercel.app
-```
-
-Optional environment presence validation in your CI/CD shell:
-
-```bash
-REQUIRED_ENV_VARS="VITE_API_URL,VITE_WS_URL" \
-scripts/post-deploy-check.sh https://your-project.vercel.app
-```
-
-## Resources
-
-- [Hydra Head Protocol](https://hydra.family/head-protocol/)
-- [Aiken Smart Contracts](https://aiken-lang.org/)
-- [Midnight Network](https://midnight.network/)
-- [CrewAI Framework](https://docs.crewai.com/)
-- [Ollama](https://ollama.com/)
-
-## Documentation
-
-- [Hydra Integration](docs/hydra.md)
-- [Midnight ZK Proofs](docs/midnight.md)
-- [Masumi AI Agent](docs/masumi.md)
-- [Deployment Guide](docs/DEPLOYMENT.md)
-
-## License
+📜 License
 
 MIT License
+
+💬 Final Note
+
+Zkredit is not just a lending protocol.
+It’s a step toward self-operating financial systems.
