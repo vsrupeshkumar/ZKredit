@@ -1,11 +1,11 @@
 Autonomous Negotiation for Private, Zero-Fee Lending on Cardano
-🧠 Overview
+ Overview
 
 Zkredit is a decentralized credit protocol where lending agreements are negotiated, optimized, and executed in real time—without intermediaries, without fees, and without exposing user data.
 
 By combining zero-knowledge credit validation, off-chain execution via Hydra, and autonomous negotiation systems, Zkredit transforms lending into a self-operating financial layer.
 
-⚡ The Problem
+The Problem
 
 Traditional DeFi lending is fundamentally broken:
 
@@ -16,7 +16,7 @@ Manual decision-making → slow and suboptimal
 
 Users are forced into rigid, transparent, and costly systems.
 
-💡 The Solution
+ The Solution
 
 Zkredit introduces a new primitive for lending:
 
